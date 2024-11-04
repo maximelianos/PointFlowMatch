@@ -67,14 +67,35 @@ class RobotDatasetPcd(torch.utils.data.Dataset):
         self.use_pc_color = use_pc_color
         self.n_points = n_points
         self.rng = np.random.default_rng()
+
+        # MV
+        from droidloader.my_loader import EpisodeList
+        self.episodes = EpisodeList()
+
         return
 
     def __len__(self) -> int:
-        return len(self.sampler)
+        #return len(self.sampler)
+        return len(self.episodes.path_list)
 
     def __getitem__(self, idx: int) -> tuple[torch.Tensor, ...]:
-        sample: dict[str, np.ndarray] = self.sampler.sample_sequence(idx)
+        # MV
+        #sample: dict[str, np.ndarray] = self.sampler.sample_sequence(idx)
+        sample: dict[str, np.ndarray] = self.episodes[idx]
         cur_step_i = self.n_obs_steps * self.subs_factor
+
+        # MV debug
+        # pcd has shape [n_steps, n_points, 3]
+        # robot_state [n_steps, state_dim]
+
+        # imginfo = lambda img: print(type(img), img.dtype, img.shape, img.min(), img.max())
+        # print("pcd")
+        # imginfo(sample["pcd_xyz"])
+        #
+        # print("robot_state")
+        # imginfo(sample["robot_state"])
+        # input()
+
         pcd = sample["pcd_xyz"][: cur_step_i : self.subs_factor]
         if self.use_pc_color:
             pcd_color = sample["pcd_color"][: cur_step_i : self.subs_factor]

@@ -6,7 +6,7 @@ obs_features_dim: 256
 y_dim: 10  # (xyz, rot6d, g)
 x_dim: "${eval: '${obs_features_dim} + ${y_dim}'}"
 n_obs_steps: 2
-n_pred_steps: 32  # Must be divisible by 4
+n_pred_steps: 8  # Must be divisible by 4 (original 32)
 use_ema: True
 save_each_n_epochs: 500
 obs_mode: pcd  # pcd | rgb
@@ -25,13 +25,13 @@ run_name: null  # set this to continue training from previous ckpt
 dataset:
   n_obs_steps: ${n_obs_steps}
   n_pred_steps: ${n_pred_steps}
-  subs_factor: 3
+  subs_factor: 1 # original 3
   use_pc_color: False
   n_points: 4096
 
 
 dataloader:
-  batch_size: 128
+  batch_size: 2
   num_workers: 0
   # pin_memory: True
 
