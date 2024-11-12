@@ -59,7 +59,7 @@ def main(cfg: OmegaConf):
 
     wandb_logger = WandBLogger(
         project="pfp-train-fixed",
-        entity="rl-lab-chisari",
+        #entity="rl-lab-chisari",
         init_kwargs={
             "config": OmegaConf.to_container(cfg),
             "mode": "online" if cfg.log_wandb else "disabled",

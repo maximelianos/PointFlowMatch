@@ -68,20 +68,30 @@ class RobotDatasetPcd(torch.utils.data.Dataset):
         self.n_points = n_points
         self.rng = np.random.default_rng()
 
-        # MV
-        from droidloader.train_loader import EpisodeList
-        self.episodes = EpisodeList()
+        self.use_droid = True
 
-        return
+        # MV
+        if self.use_droid:
+            _is_train: bool = not "train" in str(data_path)
+            from droidloader.train_loader import EpisodeList
+            self.episodes = EpisodeList(_is_train)
 
     def __len__(self) -> int:
-        #return len(self.sampler)
-        return len(self.episodes)
+        if self.use_droid:
+            print(">>>", len(self.episodes))
+            input()
+            return len(self.episodes)
+        else:
+            print(">>>", len(self.sampler))
+            input()
+            return len(self.sampler)
 
     def __getitem__(self, idx: int) -> tuple[torch.Tensor, ...]:
         # MV
-        #sample: dict[str, np.ndarray] = self.sampler.sample_sequence(idx)
-        sample: dict[str, np.ndarray] = self.episodes[idx]
+        if self.use_droid:
+            sample: dict[str, np.ndarray] = self.episodes[idx]
+        else:
+            sample: dict[str, np.ndarray] = self.sampler.sample_sequence(idx)
         cur_step_i = self.n_obs_steps * self.subs_factor
 
         # MV debug
