@@ -72,18 +72,19 @@ class RobotDatasetPcd(torch.utils.data.Dataset):
 
         # MV
         if self.use_droid:
-            _is_train: bool = not "train" in str(data_path)
+            _is_train: bool = "train" in str(data_path)
             from droidloader.train_loader import EpisodeList
             self.episodes = EpisodeList(_is_train)
+            print(">>> create dataloader, is_train", _is_train, "len", len(self))
 
     def __len__(self) -> int:
         if self.use_droid:
-            print(">>>", len(self.episodes))
-            input()
+            #print(">>>", len(self.episodes))
+            #input()
             return len(self.episodes)
         else:
-            print(">>>", len(self.sampler))
-            input()
+            #print(">>>", len(self.sampler))
+            #input()
             return len(self.sampler)
 
     def __getitem__(self, idx: int) -> tuple[torch.Tensor, ...]:
@@ -106,6 +107,8 @@ class RobotDatasetPcd(torch.utils.data.Dataset):
         #imginfo(sample["robot_state"])
         #print(sample["robot_state"])
         #input()
+
+        # END MV
 
         pcd = sample["pcd_xyz"][: cur_step_i : self.subs_factor]
         if self.use_pc_color:
