@@ -69,17 +69,18 @@ class RobotDatasetPcd(torch.utils.data.Dataset):
         self.rng = np.random.default_rng()
 
         self.use_droid = True
+        self.is_test = True
 
         # MV
         if self.use_droid:
-            _is_train: bool = "train" in str(data_path)
+            self.is_train: bool = "train" in str(data_path)
             from droidloader.train_loader import EpisodeList
-            self.episodes = EpisodeList(_is_train)
-            print(">>> create dataloader, is_train", _is_train, "len", len(self))
+            self.episodes = EpisodeList(self.is_train)
+            print(">>> create dataloader, is_train", self.is_train, "len", len(self))
 
     def __len__(self) -> int:
         if self.use_droid:
-            #print(">>>", len(self.episodes))
+            #print(">>>", len(self.sampler))
             #input()
             return len(self.episodes)
         else:
