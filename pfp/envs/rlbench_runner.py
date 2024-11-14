@@ -39,11 +39,36 @@ class RLBenchRunner:
         steps_list: list[int] = []
         self.env.reset_rng()
 
+        import numpy as np
+        from droidloader.eval_logger import EvalLogger, eval_results
+
+        eval_logger = EvalLogger()
+
         for idx in range(len(self.episodes)):
             sample = self.episodes[idx]
-            obs = sample["robot_state"]
+            eval_logger.vis_start(eval_results.episode_idx)
+
+            obs = sample["robot_state"] # (n_steps, robot_state)
+            pcd = sample["pcd_xyz"] # (n_steps, n_points, 3)
+            pcd = pcd[0, :4096]
+
+            result_traj = np.zeros_like(obs)
+            result_traj[0] = obs[0]
+
+            robot_state = obs[0]
+            eval_logger.vis_step(robot_state)
+            for step in range(1, len(obs)):
+                prediction = policy.predict_action(pcd, robot_state)  # (K, n_pred_steps, robot_state)
+                robot_state = prediction[-1, 0]
+                result_traj[step] = robot_state
+                eval_logger.vis_step(robot_state)
+
             imginfo(obs)
-            input()
+            imginfo(result_traj)
+            eval_results.pred = result_traj
+            eval_logger.vis_stop()
+
+        return
 
         for episode in tqdm(range(self.num_episodes)):
             print(episode)
