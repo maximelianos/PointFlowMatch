@@ -55,14 +55,30 @@ class RLBenchRunner:
             result_traj = np.zeros_like(obs)
             result_traj[0] = obs[0]
 
-            robot_state = obs[0]
-            eval_logger.vis_step(robot_state)
-            for step in range(1, len(obs)):
-                prediction = policy.predict_action(pcd, robot_state)  # (K, n_pred_steps, robot_state)
-                robot_state = prediction[-1, 0]
-                result_traj[step] = robot_state
-                eval_logger.vis_step(robot_state)
-
+            step = 1
+            while step < len(obs):
+                prediction = policy.predict_action(pcd, result_traj[step-1])  # (K, n_pred_steps, robot_state)
+                _pred_len = prediction.shape[1]
+                for i in range(_pred_len):
+                    if step < len(obs):
+                        result_traj[step] = prediction[-1, i]
+                        step += 1
+                    else:
+                        break
+                break
+            # robot_state = obs[0]
+            # #eval_logger.vis_step(robot_state)
+            # for step in range(1, len(obs)):
+            #     prediction = policy.predict_action(pcd, robot_state)  # (K, n_pred_steps, robot_state)
+            #     _pred_len = len(obs)
+            #     result_traj[1:_pred_len] = prediction[-1, :_pred_len-1]
+            #     break
+            #     robot_state = prediction[-1, 0]
+            #     result_traj[step] = robot_state
+            #     eval_logger.vis_step(robot_state)
+            #
+            for step in range(len(obs)):
+                eval_logger.vis_step(result_traj[step])
             imginfo(obs)
             imginfo(result_traj)
             eval_results.pred = result_traj
