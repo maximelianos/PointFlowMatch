@@ -20,7 +20,6 @@ class RLBenchRunner:
         self.verbose = verbose
 
         self.use_droid = True
-        self.is_test = True
 
         # MV
         if self.use_droid:
