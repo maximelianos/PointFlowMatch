@@ -47,20 +47,6 @@ class RobotDatasetPcd(torch.utils.data.Dataset):
         """
         To me it makes sense that sequence_length == n_obs_steps + n_prediction_steps
         """
-        replay_buffer = RobotReplayBuffer.create_from_path(data_path, mode="r")
-        data_keys = ["robot_state", "pcd_xyz"]
-        data_key_first_k = {"pcd_xyz": n_obs_steps * subs_factor}
-        if use_pc_color:
-            data_keys.append("pcd_color")
-            data_key_first_k["pcd_color"] = n_obs_steps * subs_factor
-        self.sampler = SequenceSampler(
-            replay_buffer=replay_buffer,
-            sequence_length=(n_obs_steps + n_pred_steps) * subs_factor - (subs_factor - 1),
-            pad_before=(n_obs_steps - 1) * subs_factor,
-            pad_after=(n_pred_steps - 1) * subs_factor + (subs_factor - 1),
-            keys=data_keys,
-            key_first_k=data_key_first_k,
-        )
         self.n_obs_steps = n_obs_steps
         self.n_prediction_steps = n_pred_steps
         self.subs_factor = subs_factor
@@ -76,6 +62,22 @@ class RobotDatasetPcd(torch.utils.data.Dataset):
             from droidloader.train_loader import EpisodeList
             self.episodes = EpisodeList(self.is_train)
             print(">>> create dataloader, is_train", self.is_train, "len", len(self))
+        else:
+            replay_buffer = RobotReplayBuffer.create_from_path(data_path, mode="r")
+            data_keys = ["robot_state", "pcd_xyz"]
+            data_key_first_k = {"pcd_xyz": n_obs_steps * subs_factor}
+            if use_pc_color:
+                data_keys.append("pcd_color")
+                data_key_first_k["pcd_color"] = n_obs_steps * subs_factor
+            self.sampler = SequenceSampler(
+                replay_buffer=replay_buffer,
+                sequence_length=(n_obs_steps + n_pred_steps) * subs_factor - (subs_factor - 1),
+                pad_before=(n_obs_steps - 1) * subs_factor,
+                pad_after=(n_pred_steps - 1) * subs_factor + (subs_factor - 1),
+                keys=data_keys,
+                key_first_k=data_key_first_k,
+            )
+
 
     def __len__(self) -> int:
         if self.use_droid:
