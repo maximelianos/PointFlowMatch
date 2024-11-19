@@ -242,34 +242,8 @@ class FMSO3Policy(ComposerModel, BasePolicy):
         batch: the output of the eval dataloader
         outputs: the output of the forward pass
         """
-        from droidloader.eval_logger import eval_results
-        input("hi!")
-        imginfo = lambda img: print(type(img), img.dtype, img.shape, img.min(), img.max())
-        _, _obs, _pred = batch
-        _obs = _obs.cpu().numpy()
-        _pred = _pred.cpu().numpy()
-        eval_results.obs = _obs # (b, n_obs_steps, robot_state)
-        eval_results.pred = _pred # (b, n_pred_steps, robot_state)
-        
-        _t = np.concatenate((_obs, _pred), axis=1)[0] # (n_steps, robot_state)
-        imginfo(_obs)
-        imginfo(_pred)
-        imginfo(_t)
-        imginfo(eval_results.my_data)
-
-        print(_t[:4])
-        print(eval_results.my_data[:4])
-        _m = eval_results.my_data
-        #print((_t - _m)[:, :3])
-
-
-
         batch = self._norm_data(batch)
         pcd, robot_state_obs, robot_state_pred = batch
-        print("after norm")
-        imginfo(robot_state_obs)
-        imginfo(robot_state_pred)
-
         # Eval loss
         loss_xyz, loss_so3, loss_grip = self.calculate_loss(pcd, robot_state_obs, robot_state_pred)
         loss_total = (

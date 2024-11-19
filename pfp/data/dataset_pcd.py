@@ -69,7 +69,6 @@ class RobotDatasetPcd(torch.utils.data.Dataset):
         self.rng = np.random.default_rng()
 
         self.use_droid = True
-        self.is_test = True
 
         # MV
         if self.use_droid:
