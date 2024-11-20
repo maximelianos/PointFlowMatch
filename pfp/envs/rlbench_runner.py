@@ -27,7 +27,6 @@ class RLBenchRunner:
             from droidloader.train_loader import EpisodeList
             self.episodes = EpisodeList(self.is_train)
             print(">>> create dataloader, is_train", self.is_train, "len", len(self.episodes))
-            input()
 
         return
 
@@ -55,16 +54,14 @@ class RLBenchRunner:
             result_traj[0] = obs[0]
 
             step = 1
-            while step < len(obs):
-                prediction = policy.predict_action(pcd, result_traj[step-1])  # (K, n_pred_steps, robot_state)
-                _pred_len = prediction.shape[1]
-                for i in range(_pred_len):
-                    if step < len(obs):
-                        result_traj[step] = prediction[-1, i]
-                        step += 1
-                    else:
-                        break
-                break
+            prediction = policy.predict_action(pcd, result_traj[step-1])  # (K, n_pred_steps, robot_state)
+            _pred_len = prediction.shape[1]
+            for i in range(_pred_len):
+                if step < len(obs):
+                    result_traj[step] = prediction[-1, i]
+                    step += 1
+                else:
+                    break
             # robot_state = obs[0]
             # #eval_logger.vis_step(robot_state)
             # for step in range(1, len(obs)):
@@ -86,13 +83,9 @@ class RLBenchRunner:
         return
 
         for episode in tqdm(range(self.num_episodes)):
-            print(episode)
-            input()
             policy.reset_obs()
             self.env.reset()
             for step in range(self.max_episode_length):
-                print("step", step)
-                input()
                 robot_state, obs = self.env.get_obs()
                 prediction = policy.predict_action(obs, robot_state)
                 imginfo(robot_state)
